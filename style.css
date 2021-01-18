@@ -1,0 +1,32 @@
+*{
+    margin: 0px;
+    padding: 0px;
+}
+
+body{
+    
+    background-color: #3b4248;
+}
+.container{
+    background-color: rgba(0,0,0,.2);
+    padding: 10px;
+}
+
+h1{
+     color: #01bcf3;
+}
+input[type=button]{
+    background-color: rgba(0,0,0,.2);
+    border: 2px solid #01bcf3;
+    border-radius: 20px;
+    cursor: pointer;
+    color:  white;
+    margin: 5px;
+    padding: 5px;
+    outline: none;
+}
+input[type=text]{
+    padding: 2px;
+    outline: none;
+    
+}
