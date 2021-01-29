@@ -1,7 +1,7 @@
 
 
     // var socket = io.connect('https://animeflvparty.herokuapp.com/');
-    var socket = io.connect('http://localhost:3002');
+    var socket = io.connect('http://localhost:3000/');
     chrome.runtime.onMessage.addListener(
         function(request, sender, sendResponse) {
             console.log("background.js got a message")
@@ -13,7 +13,7 @@
             }else if(request == "pause"){
                 socket.emit('pause');
                 sendResponse(request);
-            }else if(request.action == "CrearSala"){
+            }else if(request.action == "crearSala"){
                 
                 let dataGlobal;
                 chrome.storage.local.get(['salaCode'], (result) => {
@@ -45,6 +45,9 @@
             });
             return true;
                 
+            }else if(request.action == 'messageSend'){
+                socket.emit('sendMessage', request.message);
+                sendResponse(request);
             }
         }
     );
@@ -58,6 +61,13 @@
     socket.on('pause-server', (data) =>{
         chrome.tabs.query({active: true, currentWindow: true},function(tabs) {
             chrome.tabs.sendMessage(tabs[0].id, {pauseServer: "pauseServer"}, function(response) {
+                console.log(response);
+            });
+        }); 
+    });
+    socket.on('message-received', (data) =>{
+        chrome.tabs.query({active: true, currentWindow: true},function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {messageReceived:true, data: data.data}, function(response) {
                 console.log(response);
             });
         }); 

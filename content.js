@@ -67,14 +67,20 @@ if(window.location.href.substr(0,30) === 'https://www3.animeflv.net/ver/'){
                         inputText.addEventListener('keypress', (e) => {
                             if(e.key == 'Enter'){
                                 if(e.target.value != ''){
+                                    chrome.runtime.sendMessage(
+                                        {action:"messageSend", message: inputText.value},
+                                        function (response) {
+                                            console.log(response);
+                                        }
+                                    );
                                     let messageSend = document.createElement('div');
                                     let text = document.createElement('div');
                                     text.classList.add('text');
                                     text.innerText = e.target.value;
                                     messageSend.classList.add('messageSend');
                                     messageSend.appendChild(text);
-                                    messageBox.appendChild(messageSend)
-                                    console.log(e.target.value);
+                                    messageBox.appendChild(messageSend);
+                                    // console.log(e.target.value);
                                     e.target.value = '';
                                 }
                             }
@@ -85,12 +91,34 @@ if(window.location.href.substr(0,30) === 'https://www3.animeflv.net/ver/'){
                         });
                         btn.addEventListener('click',()=>{
                             if(inputText.value != ''){
+                                chrome.runtime.sendMessage(
+                                        {action:"messageSend", message: inputText.value},
+                                        function (response) {
+                                            console.log(response);
+                                        }
+                                    );
+                                let messageSend = document.createElement('div');
+                                let text = document.createElement('div');
+                                text.classList.add('text');
+                                text.innerText = e.target.value;
+                                messageSend.classList.add('messageSend');
+                                messageSend.appendChild(text);
+                                messageBox.appendChild(messageSend);
                                 console.log(inputText.value);
                                 inputText.value = '';
                             }
                         });
 
                     }
+                }else if(request.messageReceived){
+                    let messageSend = document.createElement('div');
+                    let text = document.createElement('div');
+                    text.classList.add('text');
+                    text.innerText = request.data;
+                    messageSend.classList.add('messageRequest');
+                    messageSend.appendChild(text);
+                    document.querySelector('.messageBox').appendChild(messageSend);
+                    sendResponse(request);
                 }
             }
         );

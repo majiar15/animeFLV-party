@@ -3,7 +3,7 @@ let salaDom = document.querySelector('.sala');
 let containerDom = document.querySelector('.container');
 let codigo = document.querySelector('#codigo');
 btnCrearSala.addEventListener('click', () =>{
-    chrome.runtime.sendMessage( {action: "CrearSala"}, function(response) {
+    chrome.runtime.sendMessage( {action: "crearSala"}, function(response) {
         console.log(response);
 
     });
