@@ -3,7 +3,7 @@
   "version": "1.0",
   "name": "animeFLV-party",
   "description": "extencion de google chrome para ver animes en la pagina animeFLV en grupo",
-  "permissions": ["*://*/* "],
+  "permissions": ["*://*/* ","storage"],
   "browser_action": {
     "default_popup": "index.html",
     "default_title": "AnimeFLV-party"
@@ -18,7 +18,8 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*", "file:///*/*"],
-      "js": ["funcion.js"]
+      "js": ["content.js"],
+      "css": ["sala.css"]
     }
   ]
 }
