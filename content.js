@@ -1,5 +1,14 @@
 
+chrome.extension.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if(request == "getUrl"){
+            console.log(window.location.href);
 
+            sendResponse(window.location.href)
+        }
+        return true
+    }
+)
 if(window.location.href.substr(0,30) === 'https://www3.animeflv.net/ver/'){
     var start = document.querySelector('iframe');
       
@@ -13,7 +22,7 @@ if(window.location.href.substr(0,30) === 'https://www3.animeflv.net/ver/'){
         window.location.href.substr(0,33) === "https://www.yourupload.com/embed/" ||
         window.location.href.substr(0,31) === "https://my.mail.ru/video/embed/" ||
         window.location.href.substr(0,42) === "https://hqq.tv/player/embed_player.php?vid"
-    ){
+){
 
     var startIframe = document.querySelector('#start');
     startIframe.click();
@@ -32,7 +41,10 @@ if(window.location.href.substr(0,30) === 'https://www3.animeflv.net/ver/'){
                     console.log("ya dio pause");
                     sendResponse(request);
                 }else if(request.chat == "InitialChat"){
+                    
                     if(!document.querySelector('.sala')){
+                        console.log(request);
+                        sessionStorage.setItem("sala", request.codigo);
                         // insercion del chat en la pagina 
                         let salaDom = document.createElement('div');
                         let h1 = document.createElement('h1');
@@ -48,7 +60,7 @@ if(window.location.href.substr(0,30) === 'https://www3.animeflv.net/ver/'){
                         inputText.placeholder = "Escribe tu mensaje";
                         btn.innerText = "Enviar";
                         h2.innerText = "Sala: ";                        
-                        h2.append(document.createElement('span').innerText = request.data.codigo);
+                        h2.append(document.createElement('span').innerText = request.codigo);
                         chat.classList.add('chat');
                         messageBox.classList.add('messageBox');
                         TypingArea.classList.add('TypingArea');
@@ -89,7 +101,7 @@ if(window.location.href.substr(0,30) === 'https://www3.animeflv.net/ver/'){
 
 
                         });
-                        btn.addEventListener('click',()=>{
+                        btn.addEventListener('click',(e)=>{
                             if(inputText.value != ''){
                                 chrome.runtime.sendMessage(
                                         {action:"messageSend", message: inputText.value},
@@ -100,7 +112,7 @@ if(window.location.href.substr(0,30) === 'https://www3.animeflv.net/ver/'){
                                 let messageSend = document.createElement('div');
                                 let text = document.createElement('div');
                                 text.classList.add('text');
-                                text.innerText = e.target.value;
+                                text.innerText = inputText.value;
                                 messageSend.classList.add('messageSend');
                                 messageSend.appendChild(text);
                                 messageBox.appendChild(messageSend);
@@ -110,7 +122,9 @@ if(window.location.href.substr(0,30) === 'https://www3.animeflv.net/ver/'){
                         });
 
                     }
-                }else if(request.messageReceived){
+                    sendResponse(request.codigo)
+                }
+                else if(request.messageReceived){
                     let messageSend = document.createElement('div');
                     let text = document.createElement('div');
                     text.classList.add('text');
@@ -119,7 +133,17 @@ if(window.location.href.substr(0,30) === 'https://www3.animeflv.net/ver/'){
                     messageSend.appendChild(text);
                     document.querySelector('.messageBox').appendChild(messageSend);
                     sendResponse(request);
+                }else if(request.isInitial == "isInitial"){
+                    let sala = sessionStorage.getItem('sala');
+                    console.log(sala);
+                    if(sala){
+                        sendResponse(sala);
+                    }else{
+                        sendResponse(true);
+                    }
+                    
                 }
+                return true;
             }
         );
 
@@ -141,8 +165,10 @@ if(window.location.href.substr(0,30) === 'https://www3.animeflv.net/ver/'){
             );
         });
 
-    }, 1000);
-    
+    }, 1500);
+}else{
+
+
 
 }
 

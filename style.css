@@ -4,13 +4,17 @@
 }
 
 body{
-    
+    min-width: 340px;
+    min-height: 33px;
+    font-size: 14px;
+    margin: 8px;
     background-color: #3b4248;
 }
 .hidden{
     display: none;
 }
 .container{
+    display: none;
     background-color: rgba(0,0,0,.2);
     padding: 10px;
 }
@@ -35,4 +39,7 @@ input[type=text]{
     padding: 2px;
     outline: none;
     
+}
+p{
+    width: auto;
 }

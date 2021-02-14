@@ -1,7 +1,10 @@
+    var socket = io.connect('https://animeflvparty.herokuapp.com/');
 
+    // var socket = io.connect('http://localhost:3000/');
+    chrome.runtime.sendMessage(
+        {activo: "activo", href: window.location.href}
+    )
 
-    // var socket = io.connect('https://animeflvparty.herokuapp.com/');
-    var socket = io.connect('http://localhost:3000/');
     chrome.runtime.onMessage.addListener(
         function(request, sender, sendResponse) {
             console.log("background.js got a message")
@@ -14,41 +17,89 @@
                 socket.emit('pause');
                 sendResponse(request);
             }else if(request.action == "crearSala"){
-                
                 let dataGlobal;
-                chrome.storage.local.get(['salaCode'], (result) => {
-                    if(result.salaCode){
-                        dataGlobal = result.salaCode;
-                        sendResponse(result.salaCode);
-                    }else{
-                        fetch('http://localhost:3000/api/crear/sala',{
+                chrome.tabs.query({active: true, currentWindow: true},function(tabs) {
+                    chrome.tabs.sendMessage(tabs[0].id, "getUrl", function(response) {
+                        
+                        fetch('https://animeflvparty.herokuapp.com/api/crear/sala',{
                             method: 'post',
-                            
+                            headers: {
+								'Accept': 'application/json',
+								'Content-Type': 'application/json'
+						  
+							},
+                            body: JSON.stringify({url: response})
                         })
                         .then(response => response.json())
                         .then(data => {
-                            dataGlobal = data;
-                            chrome.storage.local.set({'salaCode': data}, function() {
-                                sendResponse(data);
-                              });
+                            dataGlobal = data.codigo;
+                            
+                            chrome.tabs.query({active: true, currentWindow: true},function(tabs) {
+                                chrome.tabs.sendMessage(tabs[0].id, {chat: "InitialChat", codigo :dataGlobal}, function(response) {
+                                    console.log(response);
+                                });                
+                            });
                         })
                         .catch(error => {
                             sendResponse(error);
                         });
-                    }
-                    chrome.tabs.query({active: true, currentWindow: true},function(tabs) {
-                        chrome.tabs.sendMessage(tabs[0].id, {chat: "InitialChat", data :dataGlobal}, function(response) {
-                            console.log(response);
-                        });
+
+                        console.log(response);
+                    });      
+                    return true;          
                 });
                 
-            });
-            return true;
                 
+                
+               
+                
+            }else if(request.action == 'InitialChat-poppup'){
+                chrome.tabs.query({active: true, currentWindow: true},function(tabs) {
+                    chrome.tabs.sendMessage(tabs[0].id, {chat: "InitialChat", codigo :request.codigo}, function(response) {
+                        console.log(response);
+                        return true;
+                    });                
+                });
+                sendResponse('chat iniciado');
             }else if(request.action == 'messageSend'){
                 socket.emit('sendMessage', request.message);
                 sendResponse(request);
+            }else if(request.action == 'isInitial'){
+                chrome.tabs.query({active: true, currentWindow: true},function(tabs) {
+                    chrome.tabs.sendMessage(tabs[0].id, {isInitial: "isInitial"}, function(response) {
+                        sendResponse(response);
+                        
+                    });                
+                });
+                
+            }else if (request.action == 'entrarSala'){
+                fetch('https://animeflvparty.herokuapp.com/api/entrar/sala',{
+                            method: 'post',
+                            headers: {
+								'Accept': 'application/json',
+								'Content-Type': 'application/json'
+						  
+							},
+                            body: JSON.stringify({codigo: request.salaId})
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            
+                        })
+                        .catch(error => {
+                            sendResponse(error);
+                        });
+
+            }else if(request == "activo"){
+                chrome.tabs.query({active: true, currentWindow: true},function(tabs) {
+                    chrome.tabs.sendMessage(tabs[0].id, "getUrl", function(response) {
+                        sendResponse(response);
+                        return true
+                    });                
+                });
+                
             }
+           return true;
         }
     );
     socket.on('play-server', (data) =>{
