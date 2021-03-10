@@ -92,6 +92,7 @@ if(window.location.href.substr(0,30) === 'https://www3.animeflv.net/ver/'){
                                     messageSend.classList.add('messageSend');
                                     messageSend.appendChild(text);
                                     messageBox.appendChild(messageSend);
+                                    messageBox.scroll(0,messageBox.scrollHeight);
                                     // console.log(e.target.value);
                                     e.target.value = '';
                                 }
@@ -116,6 +117,7 @@ if(window.location.href.substr(0,30) === 'https://www3.animeflv.net/ver/'){
                                 messageSend.classList.add('messageSend');
                                 messageSend.appendChild(text);
                                 messageBox.appendChild(messageSend);
+                                messageBox.scroll(0,messageBox.scrollHeight);
                                 console.log(inputText.value);
                                 inputText.value = '';
                             }
@@ -131,7 +133,9 @@ if(window.location.href.substr(0,30) === 'https://www3.animeflv.net/ver/'){
                     text.innerText = request.data;
                     messageSend.classList.add('messageRequest');
                     messageSend.appendChild(text);
-                    document.querySelector('.messageBox').appendChild(messageSend);
+                    let chat = document.querySelector('.messageBox')
+                    chat.appendChild(messageSend);
+                    chat.scroll(0,chat.getBoundingClientRect().height);
                     sendResponse(request);
                 }else if(request.isInitial == "isInitial"){
                     let sala = sessionStorage.getItem('sala');
