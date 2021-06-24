@@ -1,6 +1,7 @@
-    var socket = io.connect('https://animeflvparty.herokuapp.com/');
-
-    // var socket = io.connect('http://localhost:3000/');
+    // var link = 'https://animeflvparty.herokuapp.com/';
+    // var socket = io.connect(link);
+    var link = 'http://localhost:3000/';
+    var socket = io.connect('http://localhost:3000/');
     chrome.runtime.sendMessage(
         {activo: "activo", href: window.location.href}
     )
@@ -20,39 +21,44 @@
                 let dataGlobal;
                 chrome.tabs.query({active: true, currentWindow: true},function(tabs) {
                     chrome.tabs.sendMessage(tabs[0].id, "getUrl", function(response) {
-                        
-                        fetch('https://animeflvparty.herokuapp.com/api/crear/sala',{
-                            method: 'post',
-                            headers: {
-								'Accept': 'application/json',
-								'Content-Type': 'application/json'
-						  
-							},
-                            body: JSON.stringify({url: response})
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            dataGlobal = data.codigo;
-                            
-                            chrome.tabs.query({active: true, currentWindow: true},function(tabs) {
-                                chrome.tabs.sendMessage(tabs[0].id, {chat: "InitialChat", codigo :dataGlobal}, function(response) {
-                                    console.log(response);
-                                });                
-                            });
-                        })
-                        .catch(error => {
-                            sendResponse(error);
-                        });
-
+                        // va ha content
                         console.log(response);
+                        if(!response.includes('https://www3.animeflv.net/')){
+                            fetch(link+'api/crear/sala',{
+                                method: 'post',
+                                body:{
+                                    url:response
+                                },
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json'
+                              
+                                },
+                                body: JSON.stringify({url: response})
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                dataGlobal = data.codigo;
+                                sendResponse(dataGlobal);
+                                chrome.tabs.query({active: true, currentWindow: true},function(tabs) {
+                                    chrome.tabs.sendMessage(tabs[0].id, {chat: "InitialChat", codigo :dataGlobal}, function(response) {
+                                        console.log(response);
+                                    });                
+                                });
+                            })
+                            .catch(error => {
+                                sendResponse(error);
+                            });
+                            console.log(response);
+                        }else{
+                            sendResponse(false)
+                        }
+                        
+                        return true;
                     });      
                     return true;          
                 });
-                
-                
-                
-               
-                
+                return true;
             }else if(request.action == 'InitialChat-poppup'){
                 chrome.tabs.query({active: true, currentWindow: true},function(tabs) {
                     chrome.tabs.sendMessage(tabs[0].id, {chat: "InitialChat", codigo :request.codigo}, function(response) {
@@ -67,8 +73,9 @@
             }else if(request.action == 'isInitial'){
                 chrome.tabs.query({active: true, currentWindow: true},function(tabs) {
                     chrome.tabs.sendMessage(tabs[0].id, {isInitial: "isInitial"}, function(response) {
+                        // va a  content
                         sendResponse(response);
-                        
+                        return true;
                     });                
                 });
                 
@@ -98,6 +105,21 @@
                     });                
                 });
                 
+            }else if(request == "start"){
+                chrome.tabs.query({active: true, currentWindow: true},function(tab) {
+                    chrome.tabs.sendMessage(tab[0].id, {init: true}, function(response) {
+                        // va a content
+                        let parcialResponse;
+                        chrome.tabs.sendMessage(tab[0].id, {action: 'isInitial'}, function(response) {
+                            parcialResponse = response;
+                            sendResponse(true);
+                        });
+                        sendResponse(parcialResponse);
+                        
+                        return true;
+                    });                
+                });
+                sendResponse(true);
             }
            return true;
         }
